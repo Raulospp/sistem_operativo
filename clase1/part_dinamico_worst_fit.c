@@ -24,11 +24,13 @@ void initialize_memory() {
 void print_memory() {
     printf("\nEstado de memoria:\n");
     for (int i = 0; i < block_count; i++) {
-        printf("Bloque %d | Inicio: %d | Tamaño: %d | %s\n",
-               i,
-               blocks[i].start,
-               blocks[i].size,
-               blocks[i].free ? "Libre" : "Ocupado");
+        if (blocks[i].free) {
+            printf("Bloque %d | Inicio: %d | Tamaño: %d | Libre\n",
+                   i, blocks[i].start, blocks[i].size);
+        } else {
+            printf("Bloque %d | Inicio: %d | Tamaño: %d | Ocupado por Proceso %d\n",
+                   i, blocks[i].start, blocks[i].size, blocks[i].process_id);
+        }
     }
 }
 
