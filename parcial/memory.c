@@ -3,9 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-/* ============================================================
-   PARTICIONAMIENTO FIJO
-   ============================================================ */
+/* PARTICIONAMIENTO FIJO */
 #define NUM_PARTITIONS  4
 
 typedef struct {
@@ -16,9 +14,8 @@ typedef struct {
 } FixedBlock;
 
 FixedBlock fixed_blocks[NUM_PARTITIONS];
-
-/* Particiones de tamaño diferente: 128, 256, 512, 128 = 1024 bytes total */
 int partition_sizes[NUM_PARTITIONS] = {128, 256, 512, 128};
+int process_sizes[NUM_PARTITIONS];
 
 void initialize_fixed_memory() {
     int offset = 0;
@@ -37,17 +34,11 @@ void print_fixed_memory() {
         if (fixed_blocks[i].free)
             printf("Particion %d | Inicio: %d | Tamanio: %d | Libre\n",
                    i, fixed_blocks[i].start, fixed_blocks[i].size);
-        else {
-            int fragmentacion = fixed_blocks[i].size - fixed_blocks[i].process_id;
-            /* Guardamos el tamaño del proceso por separado, usamos campo extra */
+        else
             printf("Particion %d | Inicio: %d | Tamanio: %d | Ocupado por Proceso %d\n",
                    i, fixed_blocks[i].start, fixed_blocks[i].size, fixed_blocks[i].process_id);
-            (void)fragmentacion;
-        }
     }
 }
-
-int process_sizes[NUM_PARTITIONS]; /* guarda el tamaño real de cada proceso asignado */
 
 void allocate_fixed(int pid, int size) {
     for (int i = 0; i < NUM_PARTITIONS; i++) {
@@ -79,25 +70,20 @@ void free_fixed_block(int pid) {
 
 void run_particionamiento_fijo() {
     initialize_fixed_memory();
-
     printf("\n[Memoria inicial - particiones: 128 | 256 | 512 | 128 bytes]\n");
     print_fixed_memory();
-
     printf("\n[Asignando procesos...]\n");
-    allocate_fixed(1, 100);   /* entra en particion 0 (128), desperdicia 28  */
-    allocate_fixed(2, 200);   /* entra en particion 1 (256), desperdicia 56  */
-    allocate_fixed(3, 450);   /* entra en particion 2 (512), desperdicia 62  */
-    allocate_fixed(4, 130);   /* no cabe en particion 3 (128), falla          */
+    allocate_fixed(1, 100);
+    allocate_fixed(2, 200);
+    allocate_fixed(3, 450);
+    allocate_fixed(4, 130);
     print_fixed_memory();
-
     printf("\n[Liberando proceso 2...]\n");
     free_fixed_block(2);
     print_fixed_memory();
 }
 
-/* ============================================================
-   PARTICIONAMIENTO DINAMICO - ESTRUCTURAS Y FUNCIONES COMUNES
-   ============================================================ */
+/* PARTICIONAMIENTO DINAMICO */
 #define MEMORY_SIZE 1024
 #define MAX_BLOCKS  20
 
@@ -156,9 +142,7 @@ void compact_memory() {
     printf("\nMemoria compactada.\n");
 }
 
-/* ============================================================
-   FIRST FIT
-   ============================================================ */
+/* FIRST FIT */
 void allocate_first_fit(int pid, int size) {
     for (int i = 0; i < block_count; i++) {
         if (blocks[i].free && blocks[i].size >= size) {
@@ -191,9 +175,7 @@ void run_first_fit() {
     print_memory();
 }
 
-/* ============================================================
-   WORST FIT
-   ============================================================ */
+/* WORST FIT */
 void allocate_worst_fit(int pid, int size) {
     int worst_index = -1, worst_size = -1;
     for (int i = 0; i < block_count; i++)
@@ -222,9 +204,7 @@ void run_worst_fit() {
     print_memory();
 }
 
-/* ============================================================
-   BEST FIT
-   ============================================================ */
+/* BEST FIT */
 void allocate_best_fit(int pid, int size) {
     int best_index = -1, best_size = MEMORY_SIZE + 1;
     for (int i = 0; i < block_count; i++)
@@ -253,9 +233,7 @@ void run_best_fit() {
     print_memory();
 }
 
-/* ============================================================
-   SEGMENTACION
-   ============================================================ */
+/* SEGMENTACION */
 #define MAX_SEGMENTS  8
 #define MEM_SIZE      65536
 #define SEG_READ      0x01
@@ -373,9 +351,7 @@ void run_segmentacion() {
     print_stats();
 }
 
-/* ============================================================
-   MENU PRINCIPAL
-   ============================================================ */
+/* MENU PRINCIPAL */
 int main() {
     int opcion;
     do {
