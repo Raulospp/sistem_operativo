@@ -1,22 +1,67 @@
+/**
+ * Simulador de Gestión de Memoria
+ *
+ * Este programa simula diferentes técnicas de gestión de memoria en sistemas operativos:
+ * - Particionamiento Fijo: Divide la memoria en particiones de tamaño fijo.
+ * - Particionamiento Dinámico: Asigna memoria de manera dinámica con algoritmos First Fit, Worst Fit y Best Fit.
+ * - Segmentación: Divide la memoria en segmentos con permisos de acceso.
+ *
+ * Autor: [Tu Nombre]
+ * Fecha: [Fecha]
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
-/* PARTICIONAMIENTO FIJO */
+/**
+ * Simulador de Gestión de Memoria
+ *
+ * Este programa simula diferentes técnicas de gestión de memoria en sistemas operativos:
+ * - Particionamiento Fijo: Divide la memoria en particiones de tamaño fijo.
+ * - Particionamiento Dinámico: Asigna memoria de manera dinámica con algoritmos First Fit, Worst Fit y Best Fit.
+ * - Segmentación: Divide la memoria en segmentos con permisos de acceso.
+ *
+ * Autor: [Tu Nombre]
+ * Fecha: [Fecha]
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+/* ===========================================
+   PARTICIONAMIENTO FIJO
+   ===========================================
+   En el particionamiento fijo, la memoria se divide en particiones de tamaños predefinidos.
+   Cada partición puede estar libre o ocupada por un proceso.
+*/
+
+/**
+ * Número de particiones fijas.
+ */
 #define NUM_PARTITIONS  4
 
+/**
+ * Estructura que representa un bloque fijo en la memoria.
+ */
 typedef struct {
-    int start;
-    int size;
-    int process_id;
-    bool free;
+    int start;       /**< Dirección de inicio del bloque. */
+    int size;        /**< Tamaño del bloque. */
+    int process_id;  /**< ID del proceso que ocupa el bloque (-1 si está libre). */
+    bool free;       /**< Indica si el bloque está libre. */
 } FixedBlock;
 
 FixedBlock fixed_blocks[NUM_PARTITIONS];
 int partition_sizes[NUM_PARTITIONS] = {128, 256, 512, 128};
 int process_sizes[NUM_PARTITIONS];
 
+/**
+ * Inicializa la memoria para el particionamiento fijo.
+ * Configura cada partición con su tamaño y marca como libre.
+ */
 void initialize_fixed_memory() {
     int offset = 0;
     for (int i = 0; i < NUM_PARTITIONS; i++) {
@@ -28,6 +73,10 @@ void initialize_fixed_memory() {
     }
 }
 
+/**
+ * Imprime el estado actual de la memoria en particionamiento fijo.
+ * Muestra cada partición con su estado (libre u ocupado).
+ */
 void print_fixed_memory() {
     printf("\nEstado de memoria (Particionamiento Fijo):\n");
     for (int i = 0; i < NUM_PARTITIONS; i++) {
@@ -40,6 +89,11 @@ void print_fixed_memory() {
     }
 }
 
+/**
+ * Asigna un proceso a una partición fija disponible que tenga suficiente espacio.
+ * @param pid ID del proceso a asignar.
+ * @param size Tamaño requerido por el proceso.
+ */
 void allocate_fixed(int pid, int size) {
     for (int i = 0; i < NUM_PARTITIONS; i++) {
         if (fixed_blocks[i].free && fixed_blocks[i].size >= size) {
@@ -55,6 +109,10 @@ void allocate_fixed(int pid, int size) {
     printf("No hay particion disponible para el proceso %d (tamanio %d bytes).\n", pid, size);
 }
 
+/**
+ * Libera una partición fija ocupada por un proceso específico.
+ * @param pid ID del proceso a liberar.
+ */
 void free_fixed_block(int pid) {
     for (int i = 0; i < NUM_PARTITIONS; i++) {
         if (fixed_blocks[i].process_id == pid) {
@@ -68,6 +126,10 @@ void free_fixed_block(int pid) {
     printf("Proceso %d no encontrado.\n", pid);
 }
 
+/**
+ * Ejecuta una simulación del particionamiento fijo.
+ * Inicializa la memoria, asigna procesos y libera uno.
+ */
 void run_particionamiento_fijo() {
     initialize_fixed_memory();
     printf("\n[Memoria inicial - particiones: 128 | 256 | 512 | 128 bytes]\n");
@@ -83,20 +145,40 @@ void run_particionamiento_fijo() {
     print_fixed_memory();
 }
 
-/* PARTICIONAMIENTO DINAMICO */
+/* ===========================================
+   PARTICIONAMIENTO DINAMICO
+   ===========================================
+   En el particionamiento dinámico, la memoria se asigna de manera flexible.
+   Se utilizan algoritmos como First Fit, Worst Fit y Best Fit.
+*/
+
+/**
+ * Tamaño total de la memoria para particionamiento dinámico.
+ */
 #define MEMORY_SIZE 1024
+
+/**
+ * Número máximo de bloques en la memoria dinámica.
+ */
 #define MAX_BLOCKS  20
 
+/**
+ * Estructura que representa un bloque en la memoria dinámica.
+ */
 typedef struct {
-    int  start;
-    int  size;
-    int  process_id;
-    bool free;
+    int  start;      /**< Dirección de inicio del bloque. */
+    int  size;       /**< Tamaño del bloque. */
+    int  process_id; /**< ID del proceso que ocupa el bloque (-1 si está libre). */
+    bool free;       /**< Indica si el bloque está libre. */
 } Block;
 
 Block blocks[MAX_BLOCKS];
 int   block_count = 1;
 
+/**
+ * Inicializa la memoria para el particionamiento dinámico.
+ * Crea un bloque inicial que ocupa toda la memoria y está libre.
+ */
 void initialize_memory() {
     blocks[0].start      = 0;
     blocks[0].size       = MEMORY_SIZE;
@@ -105,6 +187,10 @@ void initialize_memory() {
     block_count          = 1;
 }
 
+/**
+ * Imprime el estado actual de la memoria en particionamiento dinámico.
+ * Muestra cada bloque con su estado.
+ */
 void print_memory() {
     printf("\nEstado de memoria:\n");
     for (int i = 0; i < block_count; i++) {
@@ -117,6 +203,10 @@ void print_memory() {
     }
 }
 
+/**
+ * Libera un bloque ocupado por un proceso específico.
+ * @param pid ID del proceso a liberar.
+ */
 void free_block(int pid) {
     for (int i = 0; i < block_count; i++)
         if (blocks[i].process_id == pid) {
@@ -125,6 +215,10 @@ void free_block(int pid) {
         }
 }
 
+/**
+ * Compacta la memoria moviendo todos los bloques ocupados al inicio.
+ * Une los bloques libres en uno solo al final.
+ */
 void compact_memory() {
     int new_start = 0;
     for (int i = 0; i < block_count; i++)
@@ -142,7 +236,17 @@ void compact_memory() {
     printf("\nMemoria compactada.\n");
 }
 
-/* FIRST FIT */
+/* ===========================================
+   FIRST FIT
+   ===========================================
+   Asigna el primer bloque libre que sea lo suficientemente grande.
+*/
+
+/**
+ * Asigna memoria usando el algoritmo First Fit.
+ * @param pid ID del proceso.
+ * @param size Tamaño requerido.
+ */
 void allocate_first_fit(int pid, int size) {
     for (int i = 0; i < block_count; i++) {
         if (blocks[i].free && blocks[i].size >= size) {
@@ -163,6 +267,9 @@ void allocate_first_fit(int pid, int size) {
     printf("No hay espacio suficiente.\n");
 }
 
+/**
+ * Ejecuta una simulación del algoritmo First Fit.
+ */
 void run_first_fit() {
     initialize_memory();
     allocate_first_fit(1, 200);
@@ -175,7 +282,17 @@ void run_first_fit() {
     print_memory();
 }
 
-/* WORST FIT */
+/* ===========================================
+   WORST FIT
+   ===========================================
+   Asigna el bloque libre más grande que sea lo suficientemente grande.
+*/
+
+/**
+ * Asigna memoria usando el algoritmo Worst Fit.
+ * @param pid ID del proceso.
+ * @param size Tamaño requerido.
+ */
 void allocate_worst_fit(int pid, int size) {
     int worst_index = -1, worst_size = -1;
     for (int i = 0; i < block_count; i++)
@@ -196,6 +313,9 @@ void allocate_worst_fit(int pid, int size) {
     blocks[worst_index].process_id = pid;
 }
 
+/**
+ * Ejecuta una simulación del algoritmo Worst Fit.
+ */
 void run_worst_fit() {
     initialize_memory();
     allocate_worst_fit(1, 200);
@@ -204,7 +324,17 @@ void run_worst_fit() {
     print_memory();
 }
 
-/* BEST FIT */
+/* ===========================================
+   BEST FIT
+   ===========================================
+   Asigna el bloque libre más pequeño que sea lo suficientemente grande.
+*/
+
+/**
+ * Asigna memoria usando el algoritmo Best Fit.
+ * @param pid ID del proceso.
+ * @param size Tamaño requerido.
+ */
 void allocate_best_fit(int pid, int size) {
     int best_index = -1, best_size = MEMORY_SIZE + 1;
     for (int i = 0; i < block_count; i++)
@@ -225,6 +355,9 @@ void allocate_best_fit(int pid, int size) {
     blocks[best_index].process_id = pid;
 }
 
+/**
+ * Ejecuta una simulación del algoritmo Best Fit.
+ */
 void run_best_fit() {
     initialize_memory();
     allocate_best_fit(1, 200);
@@ -233,19 +366,47 @@ void run_best_fit() {
     print_memory();
 }
 
-/* SEGMENTACION */
+/* ===========================================
+   SEGMENTACION
+   ===========================================
+   La segmentación divide la memoria en segmentos con permisos de acceso.
+   Cada segmento tiene base, límite y permisos (lectura, escritura, ejecución).
+*/
+
+/**
+ * Número máximo de segmentos.
+ */
 #define MAX_SEGMENTS  8
+
+/**
+ * Tamaño de la memoria total.
+ */
 #define MEM_SIZE      65536
+
+/**
+ * Permiso de lectura.
+ */
 #define SEG_READ      0x01
+
+/**
+ * Permiso de escritura.
+ */
 #define SEG_WRITE     0x02
+
+/**
+ * Permiso de ejecución.
+ */
 #define SEG_EXEC      0x04
 
+/**
+ * Estructura que representa una entrada en la tabla de segmentos.
+ */
 typedef struct {
-    unsigned long base;
-    unsigned long limit;
-    int           valid;
-    int           perms;
-    char          name[16];
+    unsigned long base;   /**< Dirección base del segmento. */
+    unsigned long limit;  /**< Límite del segmento. */
+    int           valid;  /**< Indica si el segmento es válido. */
+    int           perms;  /**< Permisos del segmento. */
+    char          name[16]; /**< Nombre del segmento. */
 } SegmentEntry;
 
 SegmentEntry seg_table[MAX_SEGMENTS];
@@ -254,6 +415,9 @@ int total_accesses = 0;
 int seg_faults     = 0;
 int prot_errors    = 0;
 
+/**
+ * Inicializa la tabla de segmentos, marcando todos como inválidos.
+ */
 void init_seg_table(void) {
     int i;
     for (i = 0; i < MAX_SEGMENTS; i++) {
@@ -264,6 +428,14 @@ void init_seg_table(void) {
     num_segments = 0; total_accesses = 0; seg_faults = 0; prot_errors = 0;
 }
 
+/**
+ * Agrega un nuevo segmento a la tabla de segmentos.
+ * @param base Dirección base del segmento.
+ * @param limit Límite del segmento.
+ * @param perms Permisos del segmento.
+ * @param name Nombre del segmento.
+ * @return Índice del segmento agregado, o -1 si hay error.
+ */
 int add_segment(unsigned long base, unsigned long limit, int perms, const char *name) {
     int idx;
     if (num_segments >= MAX_SEGMENTS) { printf("[ERROR] Tabla de segmentos llena.\n"); return -1; }
@@ -282,6 +454,14 @@ int add_segment(unsigned long base, unsigned long limit, int perms, const char *
     return idx;
 }
 
+/**
+ * Traduce una dirección lógica (segmento + offset) a dirección física.
+ * Verifica permisos y límites.
+ * @param seg_num Número del segmento.
+ * @param offset Offset dentro del segmento.
+ * @param access Tipo de acceso (lectura, escritura, ejecución).
+ * @return Dirección física, o -1 si hay error.
+ */
 long translate_seg(int seg_num, unsigned long offset, int access) {
     long physical_addr;
     total_accesses++;
@@ -308,6 +488,9 @@ long translate_seg(int seg_num, unsigned long offset, int access) {
     return physical_addr;
 }
 
+/**
+ * Imprime la tabla de segmentos en formato de tabla.
+ */
 void print_seg_table(void) {
     int i;
     printf("\n+-----+----------+----------+----------+--------+\n");
@@ -330,6 +513,10 @@ void print_stats(void) {
     printf("Accesos validos   : %d\n", total_accesses - seg_faults - prot_errors);
 }
 
+/**
+ * Ejecuta una simulación de segmentación.
+ * Crea segmentos, imprime la tabla y realiza traducciones de direcciones.
+ */
 void run_segmentacion() {
     printf("=== Laboratorio: Segmentacion - Sistemas Operativos ===\n");
     init_seg_table();
