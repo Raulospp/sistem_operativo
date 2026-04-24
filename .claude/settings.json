@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/c/Windows/System32/wsl.exe -e bash -c \"echo ok && gcc --version\")"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/c/Windows/System32/wsl.exe -e bash -c \"which gcc\")",
+      "Read(//c/mingw64/bin/**)",
+      "Read(//c/mingw/bin/**)",
+      "Read(//c/Program Files/mingw-w64/mingw64/bin/**)",
+      "Bash(winget --version)",
+      "Read(//c/msys64/usr/bin/**)",
+      "Bash(pandoc --version)",
+      "Bash(python -c \"import docx; print\\('python-docx disponible'\\)\")",
+      "Bash(pip install *)",
+      "Bash(python generar_doc.py)"
+    ]
+  }
+}
